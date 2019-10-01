@@ -338,33 +338,33 @@ class qualcomm_sahara():
             self.model_id = "{:04x}".format(self.model_id)
             self.msm_str="{:08x}".format(self.msm_id)
 
-            print(f"\n------------------------\n" +
-                  f"HWID:              0x{self.hwidstr} (MSM_ID:0x{self.msm_str},OEM_ID:0x{self.oem_str},MODEL_ID:0x{self.model_id})\n" +
-                  f"PK_HASH:           0x{self.pkhash}\n" +
-                  f"Serial:            0x{self.serial}\n" +
-                  f"SBL Version:       0x{self.sblversion}\n")
+            print("\n------------------------\n" +
+                  "HWID:              0x" + self.hwidstr+ " (MSM_ID:0x" + self.msm_str+ ",OEM_ID:0x" + self.oem_str + ",MODEL_ID:0x" + self.model_id + "\n" +
+                  "PK_HASH:           0x" + self.pkhash + "\n" +
+                  "Serial:            0x" + self.serial + "\n" +
+                  "SBL Version:       0x" + self.sblversion + "\n")
             if self.programmer==None:
                 if self.hwidstr in self.loaderdb:
                     if self.pkhash[0:16]=="cc3153a80293939b":
                         print("Unfused device detected, so any loader should be fine...")
                         if self.pkhash[0:16] in self.loaderdb[self.hwidstr]:
                             fname=self.loaderdb[self.hwidstr][self.pkhash[0:16]]
-                            print(f"Trying loader: {fname}")
+                            print("Trying loader: " + fname)
                         else:
                             for loader in self.loaderdb[self.hwidstr]:
                                 fname = self.loaderdb[self.hwidstr][loader]
-                                print(f"Possible loader available: {fname}")
+                                print("Possible loader available: " + fname)
                             for loader in self.loaderdb[self.hwidstr]:
                                 fname = self.loaderdb[self.hwidstr][loader]
-                                print(f"Trying loader: {fname}")
+                                print("Trying loader: " + fname)
                                 break
                     elif self.pkhash[0:16] in self.loaderdb[self.hwidstr]:
                         fname=self.loaderdb[self.hwidstr][self.pkhash[0:16]]
-                        print(f"Detected loader: {fname}")
+                        print("Detected loader: " + fname)
                     else:
                         for loader in self.loaderdb[self.hwidstr]:
                             fname = self.loaderdb[self.hwidstr][loader]
-                            print(f"Trying loader: {fname}")
+                            print("Trying loader: " + fname)
                             break
                         #print("Couldn't find a loader for given hwid and pkhash :(")
                         #exit(0)
@@ -411,7 +411,7 @@ class qualcomm_sahara():
                 return False
             else:
                 state=str(pkt["status"])
-                print(f"Error occured on memory debug: {state}")
+                print("Error occured on memory debug: " + state)
                 return False
         elif (cmd["cmd"]==self.cmd.SAHARA_MEMORY_DEBUG or cmd["cmd"]==self.cmd.SAHARA_64BIT_MEMORY_DEBUG):
             return True

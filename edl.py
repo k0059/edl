@@ -80,7 +80,7 @@ def main():
     parser.add_argument('-maxpayload',metavar="<bytes>",help='[Option] The max bytes to transfer in firehose mode (default=1048576)', type=int, default=1048576)
     parser.add_argument('-skipwrite', help='[Option] Do not write actual data to disk (use this for UFS provisioning)', action="store_true")
     parser.add_argument('-skipstorageinit', help='[Option] Do not initialize storage device (use this for UFS provisioning)',action="store_true")
-    parser.add_argument('-memory', metavar="<UFS/eMMC>",help='[Option] Memory type (default=UFS)',default='UFS')
+    parser.add_argument('-memory', metavar="<UFS/eMMC>",help='[Option] Memory type (default=emmc)',default='emmc')
     parser.add_argument('-sectorsize', metavar="<bytes>",help='[Option] Define Disk Sector Size (default=512)',type=int,default=512)
     parser.add_argument('-lun', metavar="<num>",help='[Option] Define LUN',type=int,default=0)
     #parser.add_argument('-debug', help='[Option] Enable debug output', action="store_true")
@@ -131,7 +131,7 @@ def main():
         print("Trying with loaders in Loader directory ...")
         sahara.programmer = None
     elif (args.loader!=''):
-        print(f"Using loader {args.loader} ...")
+        print("Using loader {args.loader} ...")
         with open(args.loader, "rb") as rf:
             sahara.programmer = rf.read()
     else:
@@ -154,7 +154,7 @@ def main():
         else:
             print("Device detected :)")
             mode=sahara.connect()
-            print(f"Mode detected: {mode}")
+            print("Mode detected: " + mode)
             break
 
     if mode=="Sahara":
@@ -191,7 +191,7 @@ def main():
         info=fh.connect(0)
         if args.gpt!='':
             fh.cmd_read(args.lun, 0, 0x4000//cfg.SECTOR_SIZE_IN_BYTES, args.gpt)
-            print(f"Dumped GPT to {args.gpt}")
+            print("Dumped GPT to " + args.gpt)
             exit(0)
         elif args.printgpt==True:
             data = fh.cmd_read_buffer(args.lun, 0, 0x4000 // cfg.SECTOR_SIZE_IN_BYTES)
@@ -223,9 +223,9 @@ def main():
             for partition in guid_gpt.partentries:
                 if partition.name==partitionname:
                     data = fh.cmd_read(args.lun, partition.sector, partition.sectors, filename)
-                    print(f"Dumped sector {str(partition.sector)} with sector count {str(partition.sectors)} as {filename}.")
+                    print("Dumped sector " + str(partition.sector) + "with sector count " + str(partition.sectors) + " as " + filename)
                     exit(0)
-            print(f"Error: Couldn't detect partition: {partitionname}")
+            print("Error: Couldn't detect partition: " + partitionname)
             exit(0)
         elif args.rf!='':
             filename=args.rf
@@ -237,7 +237,7 @@ def main():
             )
             guid_gpt.parse(data, cfg.SECTOR_SIZE_IN_BYTES)
             data = fh.cmd_read(args.lun, 0, guid_gpt.totalsectors, filename)
-            print(f"Dumped sector 0 with sector count {str(guid_gpt.totalsectors)} as {filename}.")
+            print("Dumped sector 0 with sector count " + str(guid_gpt.totalsectors) +" as " +filename)
             exit(0)
         elif args.pbl!='':
             filename=args.pbl
@@ -245,7 +245,7 @@ def main():
                 v=infotbl[fh.cfg.TargetName]
                 if len(v[0])>0:
                     if fh.cmd_peek(v[0][0],v[0][1],filename):
-                        print(f"Dumped pbl at offset {hex(v[0][0])} as {filename}.")
+                        print("Dumped pbl at offset " + hex(v[0][0])+" as " + filename)
                         exit(0)
                 else:
                     print("No known pbl offset for this chipset")
@@ -259,7 +259,7 @@ def main():
                 v=infotbl[fh.cfg.TargetName]
                 if len(v[1])>0:
                     if fh.cmd_peek(v[1][0],v[1][1],filename):
-                        print(f"Dumped qfprom at offset {hex(v[1][0])} as {filename}.")
+                        print("Dumped qfprom at offset " + hex(v[1][0]) + " as " + filename)
                         exit(0)
                 else:
                     print("No known qfprom offset for this chipset")
@@ -273,7 +273,7 @@ def main():
                 v=infotbl[fh.cfg.TargetName]
                 if len(v[2])>0:
                     if fh.cmd_peek(v[2][0],v[2][1],filename):
-                        print(f"Dumped qfprom at offset {hex(v[2][0])} as {filename}.")
+                        print("Dumped qfprom at offset " + hex(v[2][0]) +" as "+filename)
                         exit(0)
                 else:
                     print("No known qfprom offset for this chipset")
@@ -293,15 +293,15 @@ def main():
             pnames=["userdata2","metadata","userdata","reserved1","reserved2","reserved3"]
             for partition in guid_gpt.partentries:
                 if partition.name in pnames:
-                    print(f"Detected partition: {partition.name}")
+                    print("Detected partition: " +partition.name)
                     data = fh.cmd_read_buffer(args.lun, partition.sector+(partition.sectors-(0x4000 // cfg.SECTOR_SIZE_IN_BYTES)), (0x4000 // cfg.SECTOR_SIZE_IN_BYTES), filename)
                     val=struct.unpack("<I",data[:4])[0]
                     if ((val&0xFFFFFFF0)==0xD0B5B1C0):
                         with open(filename,"wb") as wf:
                             wf.write(data)
-                            print(f"Dumped footer from {partition.name} as {filename}.")
+                            print("Dumped footer from " + partition.name+" as "+filename)
                             exit(0)
-            print(f"Error: Couldn't detect partition: {partitionname}")
+            print("Error: Couldn't detect partition: " + partitionname)
             exit(0)
         elif len(args.rs)!=0:
             if len(args.rs)!=3:
@@ -311,7 +311,7 @@ def main():
             sectors=int(args.rs[1])
             filename=args.rs[2]
             data = fh.cmd_read(args.lun, start, sectors, filename)
-            print(f"Dumped sector {str(start)} with sector count {str(sectors)} as {filename}.")
+            print("Dumped sector " + str(start) + " with sector count " + str(sectors) +" as " + filename)
             exit(0)
         elif len(args.peek)!=0:
             if len(args.peek)!=3:
@@ -338,7 +338,7 @@ def main():
             partitionname=args.w[0]
             filename=args.w[1]
             if not os.path.exists(filename):
-                print(f"Error: Couldn't find file: {filename}")
+                print("Error: Couldn't find file: " + filename)
                 exit(0)
             data = fh.cmd_read_buffer(args.lun, 0, 0x4000 // cfg.SECTOR_SIZE_IN_BYTES,False)
             guid_gpt = gpt(
@@ -354,12 +354,12 @@ def main():
                     if (os.stat(filename).st_size%fh.cfg.SECTOR_SIZE_IN_BYTES)>0:
                         sectors+=1
                     if sectors>partition.sectors:
-                        print(f"Error: {filename} has {sectors} sectors but partition only has {partition.sectors}.")
+                        print("Error: " + filename + " has " + sectors +" sectors but partition only has " + partition.sectors)
                         exit(0)
                     data = fh.cmd_write(args.lun, partition.sector, filename)
-                    print(f"Wrote {filename} to sector {str(partition.sector)}.")
+                    print("Wrote " + filename +" to sector " + str(partition.sector))
                     exit(0)
-            print(f"Error: Couldn't detect partition: {partitionname}")
+            print("Error: Couldn't detect partition: " + partitionname)
             exit(0)
         elif len(args.ws)!=0:
             if len(args.ws)!=2:
@@ -368,12 +368,12 @@ def main():
             start=int(args.ws[0])
             filename=args.ws[1]
             if not os.path.exists(filename):
-                print(f"Error: Couldn't find file: {filename}")
+                print("Error: Couldn't find file: " + filename)
                 exit(0)
             if fh.cmd_write(args.lun, start, filename)==True:
-                print(f"Wrote {filename} to sector {str(start)}.")
+                print("Wrote " + filename +" to sector " + str(start))
             else:
-                print(f"Error on writing {filename} to sector {str(start)}")
+                print("Error on writing " + filename +" to sector " + str(start))
             exit(0)
         elif args.e != '':
             partitionname=args.e
@@ -388,9 +388,9 @@ def main():
             for partition in guid_gpt.partentries:
                 if partition.name==partitionname:
                     fh.cmd_erase(args.lun, partition.sector, partition.sectors)
-                    print(f"Erased {partitionname} starting at sector {str(partition.sector)} with sector count {str(partition.sectors)}.")
+                    print("Erased " + partitionname + " starting at sector " + str(partition.sector)+ " with sector count " + str(partition.sectors))
                     exit(0)
-            print(f"Error: Couldn't detect partition: {partitionname}")
+            print("Error: Couldn't detect partition: " + partitionname)
             exit(0)
         elif len(args.es)!=0:
             if len(args.es)!=2:
@@ -399,7 +399,7 @@ def main():
             start=int(args.es[0])
             sectors=int(args.es[1])
             data = fh.cmd_erase(args.lun, start, sectors)
-            print(f"Erased sector {str(start)} with sector count {str(sectors)}.")
+            print("Erased sector " + str(start) + " with sector count " + str(sectors))
             exit(0)
         elif args.x != '':
             data=fh.cmd_xml(args.x)

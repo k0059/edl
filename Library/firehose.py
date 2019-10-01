@@ -105,10 +105,10 @@ class qualcomm_firehose:
             return False
 
     def cmd_getsha256digest(self,physical_partition_number,start_sector,num_partition_sectors):
-        data=f"<?xml version=\"1.0\" ?><data><getsha256digest SECTOR_SIZE_IN_BYTES=\"{self.cfg.SECTOR_SIZE_IN_BYTES}\""+\
-             f" num_partition_sectors=\"{num_partition_sectors}\""+\
-             f" physical_partition_number=\"{physical_partition_number}\""+\
-             f" start_sector=\"{start_sector}\"/>\n</data>"
+        data="<?xml version=\"1.0\" ?><data><getsha256digest SECTOR_SIZE_IN_BYTES=\"" + self.cfg.SECTOR_SIZE_IN_BYTES + "\""+\
+             " num_partition_sectors=\"" + num_partition_sectors + "\""+\
+             " physical_partition_number=\"" + physical_partition_number + "\""+\
+             " start_sector=\"" + start_sector + "\"/>\n</data>"
         val=self.xmlsend(data)
         if val[0]==True:
             res = self.xml.getlog(val[2])
@@ -122,7 +122,7 @@ class qualcomm_firehose:
             return False
 
     def cmd_setbootablestoragedrive(self,partition_number):
-        data=f"<?xml version=\"1.0\" ?><data>\n<setbootablestoragedrive value=\"{hex(partition_number)}\" /></data>"
+        data="<?xml version=\"1.0\" ?><data>\n<setbootablestoragedrive value=\"" + hex(partition_number)+"\" /></data>"
         val=self.xmlsend(data)
         if val[0]==True:
             print("Setbootablestoragedrive succeeded.")
@@ -141,12 +141,12 @@ class qualcomm_firehose:
                 num_partition_sectors+=1
             if Display:
                 print(
-                    f"\nWriting to physical partition {str(physical_partition_number)}, sector {str(start_sector)}, sectors {str(num_partition_sectors)}")
-            data=f"<?xml version=\"1.0\" ?><data>\n"+\
-                 f"<program SECTOR_SIZE_IN_BYTES=\"{self.cfg.SECTOR_SIZE_IN_BYTES}\""+\
-                 f" num_partition_sectors=\"{num_partition_sectors}\""+\
-                 f" physical_partition_number=\"{physical_partition_number}\""+\
-                 f" start_sector=\"{start_sector}\"/>\n</data>"
+                    "\nWriting to physical partition " + str(physical_partition_number) +", sector " + str(start_sector) + ", sectors " + str(num_partition_sectors))
+            data="<?xml version=\"1.0\" ?><data>\n"+\
+                 "<program SECTOR_SIZE_IN_BYTES=\"" + str(self.cfg.SECTOR_SIZE_IN_BYTES) + "\""+\
+                 " num_partition_sectors=\"" + str(num_partition_sectors) + "\""+\
+                 " physical_partition_number=\"" + str(physical_partition_number) + "\""+\
+                 " start_sector=\"" + str(start_sector) + "\"/>\n</data>"
             rsp = self.xmlsend(data)
             pos=0
             prog=0
@@ -180,20 +180,20 @@ class qualcomm_firehose:
                 if rsp["value"]=="ACK":
                     return True
                 else:
-                    print(f"Error:{info[1]}")
+                    print("Error:" + info[1])
             else:
-                print(f"Error:{rsp}")
+                print("Error:" + rsp)
                 return False
             return False
 
     def cmd_erase(self,physical_partition_number,start_sector,num_partition_sectors,Display=True):
         if Display:
-            print(f"\nErasing from physical partition {str(physical_partition_number)}, sector {str(start_sector)}, sectors {str(num_partition_sectors)}")
-            data=f"<?xml version=\"1.0\" ?><data>\n"+\
-                 f"<program SECTOR_SIZE_IN_BYTES=\"{self.cfg.SECTOR_SIZE_IN_BYTES}\""+\
-                 f" num_partition_sectors=\"{num_partition_sectors}\""+\
-                 f" physical_partition_number=\"{physical_partition_number}\""+\
-                 f" start_sector=\"{start_sector}\"/>\n</data>"
+            print("\nErasing from physical partition " + str(physical_partition_number) + ", sector " + str(start_sector) + ", sectors " + str(num_partition_sectors))
+            data="<?xml version=\"1.0\" ?><data>\n"+\
+                 "<program SECTOR_SIZE_IN_BYTES=\"" + self.cfg.SECTOR_SIZE_IN_BYTES + "\""+\
+                 " num_partition_sectors=\"" + num_partition_sectors + "\""+\
+                 " physical_partition_number=\"" + physical_partition_number + "\""+\
+                 " start_sector=\"" + start_sector + "\"/>\n</data>"
             rsp = self.xmlsend(data)
             empty = b"\x00" * self.cfg.MaxPayloadSizeToTargetInBytes
             pos=0
@@ -225,19 +225,19 @@ class qualcomm_firehose:
                 if rsp["value"]=="ACK":
                     return True
                 else:
-                    print(f"Error:{info[1]}")
+                    print("Error:" + info[1])
             else:
-                print(f"Error:{rsp}")
+                print("Error:" + rsp)
                 return False
             return False
 
     def cmd_read_buffer(self,physical_partition_number,start_sector,num_partition_sectors,Display=True):
         if Display:
-            print(f"\nReading from physical partition {str(physical_partition_number)}, sector {str(start_sector)}, sectors {str(num_partition_sectors)}")
-        data=f"<?xml version=\"1.0\" ?><data><read SECTOR_SIZE_IN_BYTES=\"{self.cfg.SECTOR_SIZE_IN_BYTES}\""+\
-             f" num_partition_sectors=\"{num_partition_sectors}\""+\
-             f" physical_partition_number=\"{physical_partition_number}\""+\
-             f" start_sector=\"{start_sector}\"/>\n</data>"
+            print("\nReading from physical partition " + str(physical_partition_number) + ", sector " + str(start_sector) +", sectors " + str(num_partition_sectors))
+        data="<?xml version=\"1.0\" ?><data><read SECTOR_SIZE_IN_BYTES=\"" + str(self.cfg.SECTOR_SIZE_IN_BYTES) + "\""+\
+             " num_partition_sectors=\"" + str(num_partition_sectors) + "\""+\
+             " physical_partition_number=\"" + str(physical_partition_number) + "\""+\
+             " start_sector=\"" + str(start_sector) + "\"/>\n</data>"
         rsp=self.xmlsend(data)
         resData=bytearray()
         if (rsp[0])==True:
@@ -266,21 +266,21 @@ class qualcomm_firehose:
             if rsp["value"]=="ACK":
                 return resData
             else:
-                print(f"Error:{info[1]}")
+                print("Error:" + info[1])
                 return ""
         else:
-            print(f"Error:{rsp[2]}")
+            print("Error:" + rsp[2])
             return ""
         return ""
 
     def cmd_read(self,physical_partition_number,start_sector,num_partition_sectors,filename,Display=True):
         if Display:
-            print(f"\nReading from physical partition {str(physical_partition_number)}, sector {str(start_sector)}, sectors {str(num_partition_sectors)}")
+            print("\nReading from physical partition " + str(physical_partition_number) + ", sector " + str(start_sector) + ", sectors " + str(num_partition_sectors))
         with open(filename,"wb") as wf:
-            data=f"<?xml version=\"1.0\" ?><data><read SECTOR_SIZE_IN_BYTES=\"{self.cfg.SECTOR_SIZE_IN_BYTES}\""+\
-                 f" num_partition_sectors=\"{num_partition_sectors}\""+\
-                 f" physical_partition_number=\"{physical_partition_number}\""+\
-                 f" start_sector=\"{start_sector}\"/>\n</data>"
+            data="<?xml version=\"1.0\" ?><data><read SECTOR_SIZE_IN_BYTES=\"" + str(self.cfg.SECTOR_SIZE_IN_BYTES) + "\""+\
+                 " num_partition_sectors=\"" + str(num_partition_sectors) + "\""+\
+                 " physical_partition_number=\"" + str(physical_partition_number) + "\""+\
+                 " start_sector=\"" + str(start_sector) + "\"/>\n</data>"
             rsp=self.xmlsend(data)
             if (rsp[0])==True:
                 bytesToRead=self.cfg.SECTOR_SIZE_IN_BYTES*num_partition_sectors
@@ -310,10 +310,10 @@ class qualcomm_firehose:
                 if rsp["value"]=="ACK":
                     return tmp
                 else:
-                    print(f"Error:{tmp}")
+                    print("Error:" + tmp)
                     return ""
             else:
-                print(f"Error:{rsp[1]}")
+                print("Error:" + rsp[1])
                 return ""
             return ""
 
@@ -326,10 +326,10 @@ class qualcomm_firehose:
                 print(info)
         except:
             lvl=lvl
-        data=f"<?xml version =\"1.0\" ?><data>"+\
-             f"<configure MemoryName=\"{self.cfg.MemoryName}\" ZLPAwareHost=\"{str(self.cfg.ZLPAwareHost)}\" "+\
-             f"SkipStorageInit=\"{str(int(self.cfg.SkipStorageInit))}\" SkipWrite=\"{str(int(self.cfg.SkipWrite))}\" "+\
-             f"MaxPayloadSizeToTargetInBytes=\"{str(self.cfg.MaxPayloadSizeToTargetInBytes)}\"/>"+\
+        data="<?xml version =\"1.0\" ?><data>"+\
+             "<configure MemoryName=\"" + self.cfg.MemoryName + "\" ZLPAwareHost=\"" + str(self.cfg.ZLPAwareHost) + "\" "+\
+             "SkipStorageInit=\"" + str(int(self.cfg.SkipStorageInit)) + "\" SkipWrite=\"" + str(int(self.cfg.SkipWrite)) + "\" "+\
+             "MaxPayloadSizeToTargetInBytes=\"" + str(self.cfg.MaxPayloadSizeToTargetInBytes) + "\"/>"+\
              "</data>"
         '''
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" ?><data><response value=\"ACK\" MinVersionSupported=\"1\"" \
@@ -377,11 +377,11 @@ class qualcomm_firehose:
                 if lvl==0:
                     return self.connect(lvl+1)
                 else:
-                    print(f"Error:{rsp}")
+                    print("Error:" + rsp)
                     exit(0)
-        print(f"TargetName={self.cfg.TargetName}")
-        print(f"MemoryName={self.cfg.MemoryName}")
-        print(f"Version={self.cfg.Version}")
+        print("TargetName=" + self.cfg.TargetName)
+        print("MemoryName=" + self.cfg.MemoryName)
+        print("Version=" + self.cfg.Version)
         if self.cfg.MemoryName.lower()=="emmc":
             self.cfg.SECTOR_SIZE_IN_BYTES=512
         elif self.cfg.MemoryName.lower()=="ufs":
@@ -407,7 +407,7 @@ class qualcomm_firehose:
         data="<?xml version=\"1.0\" ?><data><getstorageinfo /></data>"
         val=self.xmlsend(data)
         if val[0]==True:
-            print(f"GetStorageInfo:\n--------------------\n")
+            print("GetStorageInfo:\n--------------------\n")
             print(val[1])
             return True
         else:
@@ -415,12 +415,12 @@ class qualcomm_firehose:
             return False
 
     def cmd_peek(self,address,SizeInBytes,filename):
-        print(f"Peek: Address({hex(address)}),Size({hex(SizeInBytes)})")
+        print("Peek: Address(" + hex(address) + "),Size(" + hex(SizeInBytes))
         with open(filename,"wb") as wf:
             '''
             <?xml version="1.0" ?><data><peek address64="1048576" SizeInBytes="90112" /></data>
             '''
-            data=f"<?xml version=\"1.0\" ?><data><peek address64=\"{address}\" SizeInBytes=\"{SizeInBytes}\" /></data>\n"
+            data="<?xml version=\"1.0\" ?><data><peek address64=\"" + address + "\" SizeInBytes=\"{SizeInBytes}\" /></data>\n"
             '''
             <?xml version="1.0" encoding="UTF-8" ?><data><log value="Using address 00100000" /></data> 
             <?xml version="1.0" encoding="UTF-8" ?><data><log value="0x22 0x00 0x00 0xEA 0x70 0x00 0x00 0xEA 0x74 0x00 0x00 0xEA 0x78 0x00 0
@@ -438,17 +438,17 @@ class qualcomm_firehose:
                 tmp=b""
                 while b"NAK" not in tmp and b"ACK" not in tmp:
                     tmp+=self.cdc.read(self.cfg.MaxXMLSizeInBytes)
-                data = f"<?xml version=\"1.0\" ?><data><peek address64=\"{hex(address)}\" size_in_bytes=\"{hex(SizeInBytes)}\" /></data>"
+                data = "<?xml version=\"1.0\" ?><data><peek address64=\"" + hex(address) + "\" size_in_bytes=\"" + hex(SizeInBytes) + "\" /></data>"
                 self.cdc.write(data, self.cfg.MaxXMLSizeInBytes)
                 addrinfo = self.cdc.read(self.cfg.MaxXMLSizeInBytes)
                 if b'<response' in addrinfo and 'NAK' in addrinfo:
-                    print(f"Error:{addrinfo}")
+                    print("Error:" + addrinfo)
                     return
             if (b"address" in addrinfo and b"can\'t" in addrinfo):
                 tmp=b""
                 while b"NAK" not in tmp and b"ACK" not in tmp:
                     tmp+=self.cdc.read(self.cfg.MaxXMLSizeInBytes)
-                print(f"Error:{addrinfo}")
+                print("Error:" + addrinfo)
                 return
 
             data=bytearray()
@@ -468,8 +468,8 @@ class qualcomm_firehose:
                     old=prog
 
             if b'<response' in tmp and b'ACK' in tmp:
-                print(f"Bytes from {hex(address)}, bytes read {hex(dataread)}, written to {filename}.")
+                print("Bytes from " + hex(address) + ", bytes read " + hex(dataread) + ", written to " + filename)
                 return True
             else:
-                print(f"Error:{addrinfo}")
+                print("Error:" + addrinfo)
             return True

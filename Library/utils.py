@@ -1,7 +1,7 @@
 import sys
 import struct
-from capstone import *
-from keystone import *
+#from capstone import *
+#from keystone import *
 import codecs
 
 class elf:
